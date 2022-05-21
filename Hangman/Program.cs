@@ -8,8 +8,9 @@ namespace Hangman
     {
         static void Main(string[] args)
         {
-            const int maxWrongAnswers = 5;
+            StartGame();
 
+            const int maxWrongAnswers = 5;
             int wrongAnswers = 0;
 
             //this will be automated from file in local storage!!
@@ -33,15 +34,17 @@ namespace Hangman
                 Console.WriteLine("Type a letter that you think, the word has it");
                 char answer = char.Parse(Console.ReadLine());
 
-                if (word.Contains(answer))
+                if (word.ToLower().Contains(answer))
                 {
+                    Console.WriteLine(UpdateScreen(wrongAnswers));
                     //we have a match
+                    //TODO update word showing
                 }
                 else
                 {
                     //we update screen with one more wrong answers
                     wrongAnswers++;
-                    Console.WriteLine(UpdateWorngAnswerScreen(wrongAnswers));
+                    Console.WriteLine(UpdateScreen(wrongAnswers));
                 }
 
                 if(wrongAnswers == maxWrongAnswers)
@@ -49,10 +52,40 @@ namespace Hangman
                     break;
                 }
             }
-  
+
+            bool newGame = LoseScreen();
+            if (newGame)
+            {
+                StartGame();
+            }
+            //TODO start new game
         }
 
-        private static string UpdateWorngAnswerScreen(int wrongAnswers)
+        private static void StartGame()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static bool LoseScreen()
+        {
+            Console.WriteLine();
+            Console.WriteLine("You have been hanged!");
+            Console.WriteLine();
+            Console.WriteLine("Do you wanna play again? Type Y for \"Yes\" or N for \"No\"");
+            char answer = char.Parse(Console.ReadLine());
+
+            if(answer == 'Y')
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        private static string UpdateScreen(int wrongAnswers)
         {
             StringBuilder result = new StringBuilder();
             result.AppendLine("..........");
@@ -90,6 +123,12 @@ namespace Hangman
                 result.AppendLine(".|....|...");
                 result.AppendLine(".|.../.\\..");
                 result.AppendLine(".|.../.\\..");
+            }
+            else if(wrongAnswers == 0)
+            {
+                result.AppendLine(".|........");
+                result.AppendLine(".|........");
+                result.AppendLine(".|........");
             }
 
             return result.ToString();
