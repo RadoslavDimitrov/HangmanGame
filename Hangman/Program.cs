@@ -45,25 +45,61 @@ namespace Hangman
             while (true)
             {
                 Console.WriteLine("Type a letter that you think, the word has it");
-                char answer = char.Parse(Console.ReadLine().Substring(0,1));
 
+                string isValidLetter = Console.ReadLine();
+
+                char answer;
+
+                if (isValidLetter == string.Empty)
+                {
+                    continue;
+                }
+
+                answer = char.Parse(isValidLetter.Substring(0, 1));
                 //IndexOf not found = -1;
                 //Contains("string", startIndex)
 
 
                 if (word.ToLower().Contains(answer))
                 {
-                    int index = word.ToLower().IndexOf(answer);
-                    if(wordResult[index] != answer)
+                    List<int> sameLettersIndex = new List<int>();
+
+                    for (int i = 0; i < word.Length; i++)
                     {
-                        wordResult[index] = answer;
+                        if(word.ToLower()[i] == answer)
+                        {
+                            sameLettersIndex.Add(i);
+                        }
                     }
+
+                    if(sameLettersIndex.Count == 0)
+                    {
+                        wrongAnswers++;
+                        Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult));
+                    }
+
+                    for (int i = 0; i < sameLettersIndex.Count; i++)
+                    {
+                        //already has that letter
+                        if(word[sameLettersIndex[i]] == wordResult[sameLettersIndex[i]])
+                        {
+                            //TODO add same letter again to be with warrning message
+                            wrongAnswers++;
+                            break;
+                        }
+                        else
+                        {
+                            wordResult[sameLettersIndex[i]] = word[sameLettersIndex[i]];                           
+                        }
+                    }
+
+                    Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult));
 
                     //TODO case double letter
                     //TODO alreagy have this letter
                     //TODO update word showing
 
-                    Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult));
+
 
 
                 }
@@ -112,14 +148,12 @@ namespace Hangman
 
         private static string UpdateScreen(int wrongAnswers, string word, string wordDescription, List<char> wordResult)
         {
+            Console.Clear();
             StringBuilder result = new StringBuilder();
 
-            result.AppendLine(DrowBegginingScreen());
-            result.AppendLine();
-            result.AppendLine();
+
             result.AppendLine(wordDescription);
             result.AppendLine();
-            result.AppendLine(UpdateWord(word.Length, word, wordResult));
 
             result.AppendLine("..........");
             result.AppendLine("----------");
@@ -164,6 +198,9 @@ namespace Hangman
                 result.AppendLine(".|........");
             }
 
+            result.AppendLine();
+            result.AppendLine(UpdateWord(word.Length, word, wordResult));
+
             return result.ToString();
         }
 
@@ -196,11 +233,13 @@ namespace Hangman
             Random random = new Random();
             int randIndex = random.Next(0, wordLength);
 
+            char letter = word[randIndex];
+
             StringBuilder sb = new StringBuilder();
 
             for (int i = 0; i < wordLength; i++)
             {
-                if(i == randIndex)
+                if(word[i] == letter)
                 {
                     sb.Append($"{word[i]} ");
                     result[i] = word[i];
