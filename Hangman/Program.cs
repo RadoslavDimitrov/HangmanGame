@@ -15,8 +15,8 @@ namespace Hangman
                 result = StartGame();
             }
 
-            
-            
+
+
             //TODO start new game
         }
 
@@ -25,6 +25,7 @@ namespace Hangman
             Console.Clear();
             const int maxWrongAnswers = 5;
             int wrongAnswers = 0;
+            bool isWinner = false;
 
             //this will be automated from file in local storage!!
             //TODO
@@ -47,7 +48,7 @@ namespace Hangman
                 Console.WriteLine("Type a letter that you think, the word has it");
 
                 string isValidLetter = Console.ReadLine();
-
+                bool? isValid = true;
                 char answer;
 
                 if (isValidLetter == string.Empty)
@@ -56,59 +57,61 @@ namespace Hangman
                 }
 
                 answer = char.Parse(isValidLetter.Substring(0, 1));
-                //IndexOf not found = -1;
-                //Contains("string", startIndex)
 
 
-                if (word.ToLower().Contains(answer))
+                List<int> sameLettersIndex = new List<int>();
+
+                for (int i = 0; i < word.Length; i++)
                 {
-                    List<int> sameLettersIndex = new List<int>();
-
-                    for (int i = 0; i < word.Length; i++)
+                    if (word.ToLower()[i] == answer)
                     {
-                        if(word.ToLower()[i] == answer)
-                        {
-                            sameLettersIndex.Add(i);
-                        }
+                        sameLettersIndex.Add(i);
                     }
-
-                    if(sameLettersIndex.Count == 0)
-                    {
-                        wrongAnswers++;
-                        Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult));
-                    }
-
-                    for (int i = 0; i < sameLettersIndex.Count; i++)
-                    {
-                        //already has that letter
-                        if(word[sameLettersIndex[i]] == wordResult[sameLettersIndex[i]])
-                        {
-                            //TODO add same letter again to be with warrning message
-                            wrongAnswers++;
-                            break;
-                        }
-                        else
-                        {
-                            wordResult[sameLettersIndex[i]] = word[sameLettersIndex[i]];                           
-                        }
-                    }
-
-                    Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult));
-
-                    //TODO case double letter
-                    //TODO alreagy have this letter
-                    //TODO update word showing
-
-
-
-
                 }
-                else
+
+
+
+                if (sameLettersIndex.Count == 0)
                 {
-                    //we update screen with one more wrong answers
                     wrongAnswers++;
-                    Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult));
+                    isValid = false;
                 }
+
+                for (int i = 0; i < sameLettersIndex.Count; i++)
+                {
+                    //already has that letter
+                    if (word[sameLettersIndex[i]] == wordResult[sameLettersIndex[i]])
+                    {
+                        //TODO add same letter again to be with warrning message
+                        wrongAnswers++;
+                        isValid = null;
+                        break;
+                    }
+                    else
+                    {
+                        wordResult[sameLettersIndex[i]] = word[sameLettersIndex[i]];
+                    }
+                }
+
+                Console.WriteLine(UpdateScreen(wrongAnswers, word, wordDescription, wordResult, isValid));
+
+                //TODO add method checkIsWinner
+                int count = 0;
+
+                for (int i = 0; i < word.Length; i++)
+                {
+                    if(word[i] == wordResult[i])
+                    {
+                        count++;
+                    }
+                }
+
+                if(count == word.Length)
+                {
+                    isWinner = true;
+                    break;
+                }
+
 
                 if (wrongAnswers == maxWrongAnswers)
                 {
@@ -116,8 +119,40 @@ namespace Hangman
                 }
             }
 
-            bool newGame = LoseScreen();
-            if (newGame)
+            if (isWinner)
+            {
+                bool newGameAfterWin = WinScreen();
+
+                if (newGameAfterWin)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            bool newGameAfterLose = LoseScreen();
+            if (newGameAfterLose)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private static bool WinScreen()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Congratilations, you made it.");
+            Console.WriteLine();
+            Console.WriteLine("Do you wanna play again? Type Y for \"Yes\" or N for \"No\"");
+            string answer = Console.ReadLine().ToLower();
+
+            if (answer[0] == 'y')
             {
                 return true;
             }
@@ -135,7 +170,7 @@ namespace Hangman
             Console.WriteLine("Do you wanna play again? Type Y for \"Yes\" or N for \"No\"");
             string answer = Console.ReadLine().ToLower();
 
-            if(answer[0] == 'y')
+            if (answer[0] == 'y')
             {
                 return true;
             }
@@ -146,7 +181,7 @@ namespace Hangman
 
         }
 
-        private static string UpdateScreen(int wrongAnswers, string word, string wordDescription, List<char> wordResult)
+        private static string UpdateScreen(int wrongAnswers, string word, string wordDescription, List<char> wordResult, bool? isValidAnswer)
         {
             Console.Clear();
             StringBuilder result = new StringBuilder();
@@ -167,7 +202,7 @@ namespace Hangman
                 result.AppendLine(".|........");
                 result.AppendLine(".|........");
             }
-            else if(wrongAnswers == 2)
+            else if (wrongAnswers == 2)
             {
                 result.AppendLine(".|....|...");
                 result.AppendLine(".|.../....");
@@ -191,11 +226,26 @@ namespace Hangman
                 result.AppendLine(".|.../.\\..");
                 result.AppendLine(".|.../.\\..");
             }
-            else if(wrongAnswers == 0)
+            else if (wrongAnswers == 0)
             {
                 result.AppendLine(".|........");
                 result.AppendLine(".|........");
                 result.AppendLine(".|........");
+            }
+
+            result.AppendLine();
+
+            if (isValidAnswer == null)
+            {
+                result.AppendLine(DuplicateLetter());
+            }
+            else if(isValidAnswer == true)
+            {
+                result.AppendLine(ValidLetter());
+            }
+            else if(isValidAnswer == false)
+            {
+                result.AppendLine(InvalidLetter());
             }
 
             result.AppendLine();
@@ -204,10 +254,25 @@ namespace Hangman
             return result.ToString();
         }
 
+        private static string DuplicateLetter()
+        {
+            return "You already choose that letter, choose another one!";
+        }
+
+        private static string ValidLetter()
+        {
+            return "Well done, word has that letter!";
+        }
+
+        private static string InvalidLetter()
+        {
+            return "Word does not contains that letter";
+        }
+
         private static string UpdateWord(int length, string word, List<char> wordResult)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             for (int i = 0; i < length; i++)
             {
                 sb.Append($"{wordResult[i]} ");
@@ -239,7 +304,7 @@ namespace Hangman
 
             for (int i = 0; i < wordLength; i++)
             {
-                if(word[i] == letter)
+                if (word[i] == letter)
                 {
                     sb.Append($"{word[i]} ");
                     result[i] = word[i];
