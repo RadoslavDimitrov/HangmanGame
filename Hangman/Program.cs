@@ -29,6 +29,8 @@ namespace Hangman
 
             //this will be automated from file in local storage!!
             //TODO
+            //string newWord = GenerateNewWordFromTestFile();
+
             string word = "Hello";
             string wordDescription = "Something you say to every person you know and meet";
 
@@ -144,6 +146,11 @@ namespace Hangman
             }
         }
 
+        private static string GenerateNewWordFromTestFile()
+        {
+            return "Not finished yet!!!!";
+        }
+
         private static bool WinScreen()
         {
             Console.WriteLine();
@@ -237,15 +244,15 @@ namespace Hangman
 
             if (isValidAnswer == null)
             {
-                result.AppendLine(DuplicateLetter());
+                result.AppendLine(DuplicateLetterMessage());
             }
             else if(isValidAnswer == true)
             {
-                result.AppendLine(ValidLetter());
+                result.AppendLine(ValidLetterMessage());
             }
             else if(isValidAnswer == false)
             {
-                result.AppendLine(InvalidLetter());
+                result.AppendLine(InvalidLetterMessage());
             }
 
             result.AppendLine();
@@ -254,17 +261,17 @@ namespace Hangman
             return result.ToString();
         }
 
-        private static string DuplicateLetter()
+        private static string DuplicateLetterMessage()
         {
             return "You already choose that letter, choose another one!";
         }
 
-        private static string ValidLetter()
+        private static string ValidLetterMessage()
         {
             return "Well done, word has that letter!";
         }
 
-        private static string InvalidLetter()
+        private static string InvalidLetterMessage()
         {
             return "Word does not contains that letter";
         }
@@ -331,6 +338,20 @@ namespace Hangman
             sb.AppendLine(".|........");
 
             return sb.ToString();
+        }
+
+        private class Word
+        {
+            public Word(int id, string name, string description)
+            {
+                this.Id = id;
+                this.Name = name;
+                this.Description = description;
+            }
+
+            int Id;
+            string Name;
+            string Description;
         }
     }
 }
