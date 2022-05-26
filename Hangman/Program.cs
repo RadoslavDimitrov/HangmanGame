@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 
 namespace Hangman
 {
@@ -29,10 +31,12 @@ namespace Hangman
 
             //this will be automated from file in local storage!!
             //TODO
-            //string newWord = GenerateNewWordFromTestFile();
+            var api = new CustomApi();
 
-            string word = "Hello";
-            string wordDescription = "Something you say to every person you know and meet";
+            var newWord = api.GetRandomWordFromJsonDb();
+
+            string word = newWord.Name;
+            string wordDescription = newWord.Description;
 
             List<char> wordResult = FillResultList(word);
 
@@ -144,11 +148,6 @@ namespace Hangman
             {
                 return false;
             }
-        }
-
-        private static string GenerateNewWordFromTestFile()
-        {
-            return "Not finished yet!!!!";
         }
 
         private static bool WinScreen()
@@ -340,18 +339,6 @@ namespace Hangman
             return sb.ToString();
         }
 
-        private class Word
-        {
-            public Word(int id, string name, string description)
-            {
-                this.Id = id;
-                this.Name = name;
-                this.Description = description;
-            }
-
-            int Id;
-            string Name;
-            string Description;
-        }
+        
     }
 }
