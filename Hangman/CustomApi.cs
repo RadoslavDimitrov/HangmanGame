@@ -10,10 +10,9 @@ namespace Hangman
 {
     public class CustomApi
     {
+        const string filePath = @"db.json";
         public Word GetRandomWordFromJsonDb()
         {
-            const string filePath = @"db.json";
-
             var path = Path.Combine(filePath);
 
             var file = File.Exists(path);
@@ -33,6 +32,34 @@ namespace Hangman
             var wordToReturn = source[randWordIndex];
 
             return wordToReturn;
+        }
+
+        public Word AddNewWordToJsonDb(string name, string description)
+        {
+            var source = new List<Word>();
+
+            using (StreamReader r = new StreamReader(filePath))
+            {
+                string json = r.ReadToEnd();
+                source = JsonSerializer.Deserialize<List<Word>>(json);
+            }
+
+            var newWord = new Word()
+            {
+                Id = source.Count + 1,
+                Name = name,
+                Description = description
+            };
+
+            source.Add(newWord);
+
+            string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() { WriteIndented = true });
+            using (StreamWriter outputFile = new StreamWriter(filePath))
+            {
+                outputFile.WriteLine(jsonString);
+            }
+
+            return null;
         }
     }
 
