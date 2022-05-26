@@ -31,7 +31,7 @@ namespace Hangman
 
             //this will be automated from file in local storage!!
             //TODO
-            var api = new CustomApi();
+            var api = new ConsoleApi();
 
             var newWord = api.GetRandomWordFromJsonDb();
 
@@ -39,7 +39,6 @@ namespace Hangman
             string wordDescription = newWord.Description;
 
             List<char> wordResult = FillResultList(word);
-
 
             Console.WriteLine(DrowBegginingScreen());
             Console.WriteLine();

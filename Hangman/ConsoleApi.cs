@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hangman
 {
-    public class CustomApi
+    public class ConsoleApi
     {
         const string filePath = @"db.json";
         public Word GetRandomWordFromJsonDb()
@@ -59,7 +59,7 @@ namespace Hangman
                 outputFile.WriteLine(jsonString);
             }
 
-            return null;
+            return newWord;
         }
     }
 
