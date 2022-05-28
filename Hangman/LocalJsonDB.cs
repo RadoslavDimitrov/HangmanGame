@@ -13,10 +13,6 @@ namespace Hangman
         const string filePath = @"db.json";
         public Word GetRandomWordFromJsonDb()
         {
-            var path = Path.Combine(filePath);
-
-            var file = File.Exists(path);
-
             var source = new List<Word>();
 
             using (StreamReader r = new StreamReader(filePath))
