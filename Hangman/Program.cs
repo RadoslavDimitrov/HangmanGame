@@ -24,14 +24,29 @@ namespace Hangman
 
         private static bool StartGame()
         {
+            int menuChooice = ShowMenuScreen();
+
+            if(menuChooice == 1)
+            {
+                //startGame
+            }
+            else if(menuChooice == 2)
+            {
+                //add new word
+                bool newWordResult = AddNewWordTemplate();
+            }
+            else if(menuChooice == 3)
+            {
+                //exit
+                return false;
+            }
+
             Console.Clear();
             const int maxWrongAnswers = 5;
             int wrongAnswers = 0;
             bool isWinner = false;
 
-            //this will be automated from file in local storage!!
-            //TODO
-            var api = new ConsoleApi();
+            var api = new LocalJsonDB();
 
             var newWord = api.GetRandomWordFromJsonDb();
 
@@ -147,6 +162,46 @@ namespace Hangman
             {
                 return false;
             }
+        }
+
+        private static bool AddNewWordTemplate()
+        {
+            Console.Clear();
+            Console.WriteLine("Add new word to DB");
+            Console.WriteLine();
+            Console.WriteLine("Pleace enter word to be added to DB");
+            Console.WriteLine();
+
+            string wordInput = Console.ReadLine();
+
+            return false;
+        }
+
+        private static int ShowMenuScreen()
+        {
+            Console.Clear();
+            Console.WriteLine("Hello to our game Hangman!!!");
+            Console.WriteLine();
+            Console.WriteLine("Pleace choose what you want to do.");
+            Console.WriteLine();
+            Console.WriteLine("Start game - type 1");
+            Console.WriteLine();
+            Console.WriteLine("Add new word to db - type 2");
+            Console.WriteLine();
+            Console.WriteLine("Exit game - type 3");
+
+            int answer;
+
+            bool input = int.TryParse(Console.ReadLine(), out answer);
+
+            while (input == false || answer < 1 || answer > 3)
+            {
+                Console.WriteLine("Pleace enter valid number!");
+
+                input = int.TryParse(Console.ReadLine(), out answer);
+            }
+
+            return answer;
         }
 
         private static bool WinScreen()

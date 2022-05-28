@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hangman
 {
-    public class ConsoleApi
+    public class LocalJsonDB
     {
         const string filePath = @"db.json";
         public Word GetRandomWordFromJsonDb()
@@ -50,6 +50,14 @@ namespace Hangman
                 Name = name,
                 Description = description
             };
+
+            foreach (var word in source)
+            {
+                if(word.Name == newWord.Name)
+                {
+                    return null;
+                }
+            }
 
             source.Add(newWord);
 
