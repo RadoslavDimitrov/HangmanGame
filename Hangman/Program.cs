@@ -25,20 +25,22 @@ namespace Hangman
         private static bool StartGame()
         {
             int menuChooice = ShowMenuScreen();
+            var api = new LocalJsonDB();
 
-            if(menuChooice == 1)
+            while(menuChooice != 1)
             {
-                //startGame
-            }
-            else if(menuChooice == 2)
-            {
-                //add new word
-                bool newWordResult = AddNewWordTemplate();
-            }
-            else if(menuChooice == 3)
-            {
-                //exit
-                return false;
+                if (menuChooice == 2)
+                {
+                    //add new word
+                    var newWordResult = AddNewWordTemplate(api);
+                    ShowNewWordScreen(newWordResult);
+                    menuChooice = ShowMenuScreen();
+                }
+                else if (menuChooice == 3)
+                {
+                    //exit
+                    return false;
+                }
             }
 
             Console.Clear();
@@ -46,7 +48,6 @@ namespace Hangman
             int wrongAnswers = 0;
             bool isWinner = false;
 
-            var api = new LocalJsonDB();
 
             var newWord = api.GetRandomWordFromJsonDb();
 
@@ -58,7 +59,7 @@ namespace Hangman
             Console.WriteLine(DrowBegginingScreen());
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine(wordDescription);
+            Console.WriteLine($"Word description: {wordDescription}");
             Console.WriteLine();
             Console.WriteLine(GenerateEmptyWord(word.Length, word, wordResult));
 
@@ -164,17 +165,50 @@ namespace Hangman
             }
         }
 
-        private static bool AddNewWordTemplate()
+        private static void ShowNewWordScreen(Word word)
+        {
+            Console.Clear();
+            Console.WriteLine("Your new word has been added to DB");
+            Console.WriteLine();
+            Console.WriteLine($"Word - {word.Name}");
+            Console.WriteLine();
+            Console.WriteLine($"Description - {word.Description}");
+            Console.WriteLine();
+            Console.WriteLine("Now you and other players can enjoy guesing your word!");
+            Console.WriteLine();
+            Console.WriteLine("Press any key to return to menu screen!");
+            Console.ReadLine();
+        }
+
+        public static Word AddNewWordTemplate(LocalJsonDB api)
         {
             Console.Clear();
             Console.WriteLine("Add new word to DB");
             Console.WriteLine();
             Console.WriteLine("Pleace enter word to be added to DB");
             Console.WriteLine();
-
+            
             string wordInput = Console.ReadLine();
 
-            return false;
+            while (string.IsNullOrWhiteSpace(wordInput))
+            {
+                Console.WriteLine("Pleace enter valid word.");
+                wordInput = Console.ReadLine();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Pleace enter word description, but tricky one, so player can guest the word!");
+            Console.WriteLine();
+
+            string descriptionInput = Console.ReadLine();
+
+            while (string.IsNullOrWhiteSpace(descriptionInput))
+            {
+                Console.WriteLine("Pleace enter valid description.");
+                descriptionInput = Console.ReadLine();
+            }
+
+            return api.AddNewWordToJsonDb(wordInput, descriptionInput);
         }
 
         private static int ShowMenuScreen()
@@ -209,7 +243,7 @@ namespace Hangman
             Console.WriteLine();
             Console.WriteLine("Congratilations, you made it.");
             Console.WriteLine();
-            Console.WriteLine("Do you wanna play again? Type Y for \"Yes\" or N for \"No\"");
+            Console.WriteLine("Do you wanna go to menu screen? Type Y for \"Yes\" or N for \"Exit\"");
             string answer = Console.ReadLine().ToLower();
 
             if (answer[0] == 'y')
@@ -227,7 +261,7 @@ namespace Hangman
             Console.WriteLine();
             Console.WriteLine("You have been hanged!");
             Console.WriteLine();
-            Console.WriteLine("Do you wanna play again? Type Y for \"Yes\" or N for \"No\"");
+            Console.WriteLine("Do you wanna go to menu screen? Type Y for \"Yes\" or N for \"Exit\"");
             string answer = Console.ReadLine().ToLower();
 
             if (answer[0] == 'y')
@@ -247,7 +281,6 @@ namespace Hangman
             StringBuilder result = new StringBuilder();
 
 
-            result.AppendLine(wordDescription);
             result.AppendLine();
 
             result.AppendLine("..........");
@@ -293,6 +326,9 @@ namespace Hangman
                 result.AppendLine(".|........");
             }
 
+            result.AppendLine();
+            result.AppendLine();
+            result.AppendLine($"Word description: {wordDescription}");
             result.AppendLine();
 
             if (isValidAnswer == null)
